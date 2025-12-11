@@ -1,0 +1,39 @@
+apiVersion: v2
+name: eshop-umbrella-chart
+description: A Helm umbrella chart for eShop microservices
+
+# Umbrella chart for complete eShop deployment
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.1.0
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are not expected to
+# follow Semantic Versioning. They should reflect the version the application is using.
+# It is recommended to use it with quotes.
+appVersion: "latest"
+
+# Additional metadata
+keywords:
+  - eshop
+  - microservices
+  - kubernetes
+  - umbrella
+maintainers:
+  - name: eShop Team
+    email: eshop@example.com
+
+# Dependencies on our local charts
+dependencies:
+  - name: catalog-api-chart
+    version: 0.1.0
+    repository: "file://../catalog-api-chart"
+  - name: basket-api-chart  
+    version: 0.1.0
+    repository: "file://../basket-api-chart"
+  - name: webmvc-chart
+    version: 0.1.0
+    repository: "file://../webmvc-chart"

@@ -1,0 +1,115 @@
+# Default values for webmvc-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# eShop Web MVC Configuration
+replicaCount: 1
+
+image:
+  repository: azw7225/webmvc
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: "webmvc"
+fullnameOverride: "webmvc"
+
+# Use existing service account from eshop
+serviceAccount:
+  create: false
+  name: "eshop-frontend-deployer"
+
+# eShop specific labels and annotations
+podAnnotations: {}
+podLabels:
+  app.kubernetes.io/name: webmvc
+  app.kubernetes.io/part-of: eshop
+  tier: frontend
+
+podSecurityContext: {}
+securityContext: {}
+
+# Service configuration - single port for HTTP
+service:
+  type: ClusterIP
+  ports:
+    - name: p80
+      port: 80
+      targetPort: 80
+
+# No ingress for this frontend service
+ingress:
+  enabled: false
+
+# No HTTPRoute needed
+httpRoute:
+  enabled: false
+
+# Resource limits and requests
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
+# Probes are disabled for autoscaling demo
+livenessProbe:
+  enabled: false
+  # httpGet:
+  #   path: /hc
+  #   port: 80
+  # initialDelaySeconds: 30
+  # periodSeconds: 10
+
+readinessProbe:
+  enabled: false
+  # httpGet:
+  #   path: /hc
+  #   port: 80
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+# HPA configuration
+autoscaling:
+  enabled: false  # Will be managed separately
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Environment variables
+env:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  ASPNETCORE_URLS: "http://0.0.0.0:80"
+  PurchaseUrl: "http://webshoppingapigw"
+  IdentityUrl: "http://docker.internal.localhost:5105"
+  SignalrHubUrl: "http://docker.internal.localhost:5202"
+  IdentityUrlHC: "http://identity-api/hc"
+  UseCustomizationData: "True"
+  ApplicationInsights__InstrumentationKey: ""
+  OrchestratorType: ""
+  UseLoadTest: "False"
+
+# No secret references for webmvc
+secretEnv: {}
+
+# ConfigMap references
+configMapRef:
+  - name: "external-links"
+
+# Namespace configuration
+namespace: "eshop-frontend"
+
+# Container ports
+containerPorts:
+  - containerPort: 80
+
+# No additional volumes needed
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

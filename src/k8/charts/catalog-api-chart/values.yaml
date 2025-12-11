@@ -1,0 +1,121 @@
+# Default values for catalog-api-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# eShop Catalog API Configuration
+replicaCount: 1
+
+image:
+  repository: azw7225/catalog-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: "catalog-api"
+fullnameOverride: "catalog-api"
+
+# Use existing service account from eshop
+serviceAccount:
+  create: false
+  name: "eshop-developer"
+
+# eShop specific labels and annotations
+podAnnotations: {}
+podLabels:
+  app.kubernetes.io/name: catalog-api
+  app.kubernetes.io/part-of: eshop
+  tier: api
+
+podSecurityContext: {}
+securityContext: {}
+
+# Service configuration - dual ports for HTTP and gRPC
+service:
+  type: ClusterIP
+  ports:
+    - name: p80
+      port: 80
+      targetPort: 80
+    - name: p81
+      port: 81
+      targetPort: 81
+
+# No ingress for this API service
+ingress:
+  enabled: false
+
+# No HTTPRoute needed
+httpRoute:
+  enabled: false
+
+# Resource limits and requests
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Probes are disabled for autoscaling demo
+livenessProbe:
+  enabled: false
+  # httpGet:
+  #   path: /hc
+  #   port: 80
+  # initialDelaySeconds: 30
+  # periodSeconds: 10
+
+readinessProbe:
+  enabled: false
+  # httpGet:
+  #   path: /hc
+  #   port: 80
+  # initialDelaySeconds: 5
+  # periodSeconds: 5
+
+# HPA configuration
+autoscaling:
+  enabled: false  # Will be managed separately
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Environment variables
+env:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  PicBaseUrl: "http://docker.internal.localhost:5202/c/api/v1/catalog/items/[0]/pic/"
+  EventBusConnection: "rabbitmq.eshop-data.svc.cluster.local"
+  UseCustomizationData: "True"
+  AzureServiceBusEnabled: "False"
+  AzureStorageEnabled: "False"
+  GRPC_PORT: "81"
+  PORT: "80"
+  PATH_BASE: "/catalog-api"
+
+# Secret references for environment variables
+secretEnv:
+  ConnectionStrings__CatalogDb:
+    secretName: "secret"
+    key: "ConnectionStrings__CatalogDb"
+
+# ConfigMap references
+configMapRef:
+  - name: "external-links"
+
+# Namespace configuration
+namespace: "eshop-apis"
+
+# Container ports
+containerPorts:
+  - containerPort: 80
+  - containerPort: 81
+
+# No additional volumes needed
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

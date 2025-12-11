@@ -1,0 +1,21 @@
+# Values for eShop umbrella chart
+# This file contains global configurations that can override subchart values
+
+# Global settings that apply to all subcharts
+global:
+  imageTag: "latest"
+
+# Catalog API specific overrides
+catalog-api-chart:
+  enabled: true
+  replicaCount: 2
+  
+# Basket API specific overrides  
+basket-api-chart:
+  enabled: true
+  replicaCount: 2
+
+# Web MVC specific overrides
+webmvc-chart:
+  enabled: true
+  replicaCount: 1

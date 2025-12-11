@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-api
+  namespace: eshop-apis
+  labels:
+    app.kubernetes.io/name: identity-api
+    app.kubernetes.io/part-of: eshop
+    tier: api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: identity-api
+  ports:
+  - name: p80
+    port: 80
+    targetPort: 80

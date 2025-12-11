@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "catalog-api-chart.fullname" . }}-test-connection"
+  labels:
+    {{- include "catalog-api-chart.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "catalog-api-chart.fullname" . }}:80']
+  restartPolicy: Never

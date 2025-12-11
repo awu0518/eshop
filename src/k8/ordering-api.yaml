@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ordering-api
+  namespace: eshop-apis
+  labels:
+    app.kubernetes.io/name: ordering-api
+    app.kubernetes.io/part-of: eshop
+    tier: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ordering-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ordering-api
+        app.kubernetes.io/part-of: eshop
+    spec:
+      serviceAccountName: eshop-developer
+      containers:
+      - name: ordering-api
+        image: azw7225/ordering-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        - containerPort: 81
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: ASPNETCORE_URLS
+          value: http://0.0.0.0:80
+        - name: ConnectionString
+          value: Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User
+            Id=sa;Password=Pass@word
+        - name: identityUrl
+          value: http://identity-api.eshop-apis.svc.cluster.local
+        - name: IdentityUrlExternal
+          value: http://localhost:5105
+        - name: EventBusConnection
+          value: rabbitmq.eshop-data.svc.cluster.local
+        - name: UseCustomizationData
+          value: 'True'
+        - name: AzureServiceBusEnabled
+          value: 'False'
+        - name: CheckUpdateTime
+          value: '30000'
+        - name: UseLoadTest
+          value: 'False'
+        - name: Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ
+          value: Verbose
+        - name: Serilog__MinimumLevel__Override__ordering-api
+          value: Verbose
+        - name: PATH_BASE
+          value: /ordering-api
+        - name: GRPC_PORT
+          value: '81'
+        - name: PORT
+          value: '80'
+        resources:
+          requests:
+            cpu: 150m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        # Temporarily disabled for autoscaling demo
+        # livenessProbe:
+        #   httpGet:
+        #     path: /hc
+        #     port: 80
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /hc
+        #     port: 80
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5

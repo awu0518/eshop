@@ -1,0 +1,12 @@
+dependencies:
+- name: catalog-api-chart
+  repository: file://../catalog-api-chart
+  version: 0.1.0
+- name: basket-api-chart
+  repository: file://../basket-api-chart
+  version: 0.1.0
+- name: webmvc-chart
+  repository: file://../webmvc-chart
+  version: 0.1.0
+digest: sha256:08b1ed12812ad9e9e3c1ba54ea0b33f601fc74780708c71357f50cfd07acb9e3
+generated: "2025-12-03T16:20:10.312897597-05:00"

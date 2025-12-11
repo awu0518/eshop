@@ -1,0 +1,119 @@
+# Default values for basket-api-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# eShop Basket API Configuration
+replicaCount: 1
+
+image:
+  repository: azw7225/basket-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: "basket-api"
+fullnameOverride: "basket-api"
+
+# Use existing service account from eshop
+serviceAccount:
+  create: false
+  name: "eshop-developer"
+
+# eShop specific labels and annotations
+podAnnotations: {}
+podLabels:
+  app.kubernetes.io/name: basket-api
+  app.kubernetes.io/part-of: eshop
+  tier: api
+
+podSecurityContext: {}
+securityContext: {}
+
+# Service configuration - dual ports for HTTP and gRPC
+service:
+  type: ClusterIP
+  ports:
+    - name: p80
+      port: 80
+      targetPort: 80
+    - name: p81
+      port: 81
+      targetPort: 81
+
+# No ingress for this API service
+ingress:
+  enabled: false
+
+# No HTTPRoute needed
+httpRoute:
+  enabled: false
+
+# Resource limits and requests
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 400m
+    memory: 256Mi
+
+# Probes are enabled for basket-api
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /hc
+    port: 80
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /hc
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+# HPA configuration
+autoscaling:
+  enabled: false  # Will be managed separately
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Environment variables
+env:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  ASPNETCORE_URLS: "http://0.0.0.0:80"
+  ConnectionString: "basketdata.eshop-data.svc.cluster.local"
+  identityUrl: "http://identity-api.eshop-apis.svc.cluster.local"
+  IdentityUrlExternal: "http://docker.internal.localhost:5105"
+  EventBusConnection: "rabbitmq.eshop-data.svc.cluster.local"
+  AzureServiceBusEnabled: "False"
+  UseLoadTest: "False"
+  PATH_BASE: "/basket-api"
+  GRPC_PORT: "81"
+  PORT: "80"
+
+# No secret references for basket-api
+secretEnv: {}
+
+# No ConfigMap references
+configMapRef: []
+
+# Namespace configuration
+namespace: "eshop-apis"
+
+# Container ports
+containerPorts:
+  - containerPort: 80
+  - containerPort: 81
+
+# No additional volumes needed
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

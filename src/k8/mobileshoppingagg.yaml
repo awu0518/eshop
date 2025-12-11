@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mobileshoppingagg
+  namespace: eshop-gateways
+  labels:
+    app.kubernetes.io/name: mobileshoppingagg
+    app.kubernetes.io/part-of: eshop
+    tier: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mobileshoppingagg
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mobileshoppingagg
+        app.kubernetes.io/part-of: eshop
+    spec:
+      containers:
+      - name: mobileshoppingagg
+        image: azw7225/gateway-mobil-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: urls__basket
+          value: http://basket-api
+        - name: urls__catalog
+          value: http://catalog-api
+        - name: urls__orders
+          value: http://ordering-api
+        - name: urls__identity
+          value: http://identity-api
+        - name: urls__grpcBasket
+          value: http://basket-api:81
+        - name: urls__grpcCatalog
+          value: http://catalog-api:81
+        - name: urls__grpcOrdering
+          value: http://ordering-api:81
+        - name: CatalogUrlHC
+          value: http://catalog-api/hc
+        - name: OrderingUrlHC
+          value: http://ordering-api/hc
+        - name: IdentityUrlHC
+          value: http://identity-api/hc
+        - name: BasketUrlHC
+          value: http://basket-api/hc
+        - name: PaymentUrlHC
+          value: http://payment-api/hc
+        - name: IdentityUrlExternal
+          value: http://docker.internal.localhost:5105
+        livenessProbe:
+          httpGet:
+            path: /hc
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+
+        readinessProbe:
+          httpGet:
+            path: /hc
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 3

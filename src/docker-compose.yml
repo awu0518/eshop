@@ -1,0 +1,117 @@
+version: '3.4'
+
+services:
+
+  seq:
+    image: datalust/seq:latest
+
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2019-latest 
+
+  nosqldata:
+    image: mongo
+
+  basketdata:
+    image: redis:alpine
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  identity-api:
+    image: azw7225/identity-api
+    depends_on:
+      - sqldata
+
+  basket-api:
+    image: azw7225/basket-api
+    depends_on:
+      - basketdata
+      - identity-api
+      - rabbitmq
+
+  catalog-api:
+    image: azw7225/catalog-api
+    depends_on:
+      - sqldata
+      - rabbitmq
+
+  ordering-api:
+    image: azw7225/ordering-api
+    depends_on:
+      - sqldata
+      - rabbitmq
+
+  ordering-backgroundtasks:
+    image: azw7225/ordering-backgroundtasks
+    depends_on:
+      - sqldata
+      - rabbitmq
+
+  payment-api:
+    image: azw7225/payment-api
+    depends_on:
+      - rabbitmq
+
+  webhooks-api:
+    image: azw7225/webhooks-api
+    depends_on:
+      - sqldata
+
+  mobileshoppingapigw:
+    image: envoyproxy/envoy:v1.11.1
+
+  mobileshoppingagg:
+    image: azw7225/gateway-mobil-api
+    depends_on:
+      - nosqldata
+      - sqldata
+      - identity-api
+      - rabbitmq
+      - ordering-api
+      - catalog-api
+      - basket-api
+
+  webshoppingagg:
+    image: azw7225/gateway-web-api
+    depends_on:
+      - nosqldata
+      - sqldata
+      - identity-api
+      - rabbitmq
+      - ordering-api
+      - catalog-api
+      - basket-api
+
+  ordering-signalrhub:
+    image: azw7225/ordering-signalrhub
+    depends_on:
+      - nosqldata
+      - sqldata
+      - identity-api
+      - rabbitmq
+      - ordering-api
+      - catalog-api
+      - basket-api
+
+  webstatus:
+    image: azw7225/webstatus
+
+  webspa:
+    image: azw7225/webspa
+    depends_on:
+      - webshoppingagg
+      - webshoppingapigw
+
+  webmvc:
+    image: azw7225/webmvc
+    depends_on:
+      - webshoppingagg
+      - webshoppingapigw
+
+  webhooks-client:
+    image: azw7225/webhook-client
+    depends_on:
+      - webhooks-api
+
+  webshoppingapigw:
+    image: envoyproxy/envoy:v1.11.1
