@@ -35,8 +35,8 @@ jobs:
     - uses: ./.github/workflows/composite/build-push
       with:
         service: ${{ env.SERVICE }}
-        registry_host: ${{ secrets.REGISTRY_HOST }}
-        registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+        registry_host: docker.io
+        registry_endpoint: docker.io/${{ secrets.DOCKER_HUB_USERNAME }}
         image_name: ${{ env.IMAGE }}
-        registry_username: ${{ secrets.USERNAME }}
-        registry_password: ${{ secrets.PASSWORD }}
+        registry_username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        registry_password: ${{ secrets.DOCKER_HUB_TOKEN }}
